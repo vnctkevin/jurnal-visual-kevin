@@ -1,0 +1,42 @@
+from django.views import generic
+from .forms import PostForm
+from django.shortcuts import render, redirect
+from .models import Post
+
+from django.http import HttpResponse
+
+class PostList(generic.ListView):
+    """
+    Return all posts that are with status 1 (published) and order from the latest one.
+    """
+    queryset = Post.objects.filter(status=1).order_by('-created_at')
+    template_name = 'index.html'
+
+
+class PostDetail(generic.DetailView):
+    model = Post
+    template_name = 'post_detail.html'
+
+    def image():
+        return HttpResponse(Post.image, content_type="image/png")
+
+class FormView(generic.FormView):
+    form_class = PostForm
+    template_name = 'post_new.html'
+    
+
+    def hotel_image_view(request):
+  
+        if request.method == 'POST':
+            form = PostForm(request.POST, request.FILES)
+    
+            if form.is_valid():
+                form.save()
+                return redirect('success')
+        else:
+            form = PostForm()
+        return render(request, 'hotel_image_form.html', {'form' : form})
+  
+  
+def success(request):
+    return HttpResponse('successfully uploaded')
